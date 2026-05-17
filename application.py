@@ -183,7 +183,7 @@ def prior_auth_denial(
         request.SDFamilyID,
 
         "emailToUse":
-        request.SDEmailAddress,
+        request.address,
 
         "phoneToUse":
         request.SDPrimaryContactNumber,
