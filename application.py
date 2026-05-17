@@ -14,7 +14,7 @@ class PriorAuthRequest(BaseModel):
     SDMemberID: str
     SDFamilyID: str
     SDAge: int
-    SDRelationType: str
+    SDFamilyMemberRelationType: str
 
     SDFirstName: Optional[str] = None
     SDLastName: Optional[str] = None
@@ -26,7 +26,7 @@ class PriorAuthRequest(BaseModel):
     SDPolicyNumber: Optional[str] = None
 
     address: Optional[str] = None
-    SDPrimaryPhone: Optional[str] = None
+    SDPrimaryContactNumber: Optional[str] = None
 
     SDOkToSMS: bool = False
     SDOkToEmail: bool = False
@@ -61,12 +61,11 @@ def prior_auth_denial(
     is_minor = (
     request.SDAge >= 0 and
     request.SDAge <= 11 and
-    request.SDFamilyMemberRelationType in [
+    request.SDRelationType in [
         "Subscriber of Child",
         "Child"
     ]
-    )
-
+)
     # ---------------------------------------
     # Dynamic Prompt Creation
     # ---------------------------------------
