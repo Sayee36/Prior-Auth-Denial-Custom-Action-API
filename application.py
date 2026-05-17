@@ -16,7 +16,6 @@ class PriorAuthRequest(BaseModel):
     SDAge: int
     SDRelationType: str
 
-    SDSubscriberID: Optional[str] = None
     SDFirstName: Optional[str] = None
     SDLastName: Optional[str] = None
 
@@ -26,7 +25,7 @@ class PriorAuthRequest(BaseModel):
     SDServiceModel: Optional[str] = None
     SDPolicyNumber: Optional[str] = None
 
-    SDPrimaryEmail: Optional[str] = None
+    address: Optional[str] = None
     SDPrimaryPhone: Optional[str] = None
 
     SDOkToSMS: bool = False
@@ -60,8 +59,12 @@ def prior_auth_denial(
         )
 
     is_minor = (
-        request.SDAge <= 11 and
-        request.SDRelationType == "Subscriber of Child"
+    request.SDAge >= 0 and
+    request.SDAge <= 11 and
+    request.SDFamilyMemberRelationType in [
+        "Subscriber of Child",
+        "Child"
+    ]
     )
 
     # ---------------------------------------
@@ -115,6 +118,10 @@ def prior_auth_denial(
     - Email should be concise
     - Mention nurse outreach
     - Mention prior authorization denial
+    - Email Should Include:
+        - Header
+        - Footer
+        - Clean HTML
     """
 
     user_prompt = f"""
@@ -173,17 +180,14 @@ def prior_auth_denial(
         "memberId":
         request.SDMemberID,
 
-        "subscriberId":
-        request.SDSubscriberID,
-
         "familyId":
         request.SDFamilyID,
 
         "emailToUse":
-        request.SDPrimaryEmail,
+        request.SDEmailAddress,
 
         "phoneToUse":
-        request.SDPrimaryPhone,
+        request.SDPrimaryContactNumber,
 
         "sendSMS":
         request.SDOkToSMS,
