@@ -5,7 +5,7 @@ import requests
 
 app = FastAPI()
 
-GROQ_API_KEY = "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"
+GROQ_API_KEY = "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"
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 
@@ -61,11 +61,12 @@ def prior_auth_denial(
     is_minor = (
     request.SDAge >= 0 and
     request.SDAge <= 11 and
-    request.SDRelationType in [
+    request.SDFamilyMemberRelationType in [
         "Subscriber of Child",
         "Child"
     ]
-)
+    )
+
     # ---------------------------------------
     # Dynamic Prompt Creation
     # ---------------------------------------
@@ -102,7 +103,8 @@ def prior_auth_denial(
     You are an AJO healthcare communication assistant.
 
     Generate:
-    1. Short SMS text
+    
+    1. SMS text Content
     2. Professional Email Subject
     3. Professional Email Body
 
@@ -158,9 +160,20 @@ def prior_auth_denial(
         json=payload
     )
 
-    ai_result = response.json()
+    # 1. Print the response status and content directly to your terminal
+    print(f"--- DEBUG: Groq Status Code: {response.status_code} ---")
+    print(f"--- DEBUG: Groq Error Body: {response.text} ---")
 
+    # 2. Prevent the application from crashing with a generic 500 error
+    if response.status_code != 200:
+        raise HTTPException(
+            status_code=200,
+            detail=f"Groq API Error: {response.text}"
+        )
+
+    ai_result = response.json()
     generated_message = ai_result["choices"][0]["message"]["content"]
+
 
     # ---------------------------------------
     # FINAL RESPONSE TO AJO
